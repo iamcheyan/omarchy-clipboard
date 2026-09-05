@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 import qs.Commons
 import qs.Ui
 
@@ -11,7 +12,7 @@ BarWidget {
     readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
     readonly property string bindingScript: [
         'hl.unbind("SUPER + CTRL + V")',
-        'hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("omarchy-shell iamcheyan.clipboard toggleAtCursor"), { description = "Clipboard manager" })'
+        'hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("omarchy-shell iamcheyan.clipboard toggleAtCursor"), { description = "iamcheyan Clipboard" })'
     ].join("; ")
     readonly property string restoreScript: [
         'hl.unbind("SUPER + CTRL + V")',
@@ -21,7 +22,29 @@ BarWidget {
     implicitWidth: button.implicitWidth
     implicitHeight: button.implicitHeight
 
-    Component.onCompleted: Quickshell.execDetached(["hyprctl", "eval", root.bindingScript])
+    function applyBinding() {
+        Quickshell.execDetached(["hyprctl", "eval", root.bindingScript]);
+    }
+
+    Component.onCompleted: {
+        root.applyBinding();
+        bindingEnsureDelay.start();
+    }
+
+    Timer {
+        id: bindingEnsureDelay
+        interval: 1200
+        repeat: false
+        onTriggered: root.applyBinding()
+    }
+
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (event && event.name === "configreloaded") bindingEnsureDelay.restart();
+        }
+    }
+
     Component.onDestruction: Quickshell.execDetached(["hyprctl", "eval", root.restoreScript])
 
     function injectPanel() {
