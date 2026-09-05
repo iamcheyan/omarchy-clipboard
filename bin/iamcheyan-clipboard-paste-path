@@ -3,7 +3,7 @@ set -euo pipefail
 
 path="${1:-}"
 if [[ -z "$path" ]]; then
-  echo "usage: hancore-clipboard-paste-path <path>" >&2
+  echo "usage: iamcheyan-clipboard-paste-path <path>" >&2
   exit 1
 fi
 

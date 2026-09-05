@@ -11,11 +11,11 @@ fi
 
 case "$action" in
   toggle|toggle-at-bar|open|open-at-bar) ;;
-  *) echo "usage: hancore-clipboard [toggle|toggle-at-bar|open|open-at-bar] [bar-height]" >&2; exit 2 ;;
+  *) echo "usage: iamcheyan-clipboard [toggle|toggle-at-bar|open|open-at-bar] [bar-height]" >&2; exit 2 ;;
 esac
 
 exec env \
   HANCORE_CLIPBOARD_ON_DEMAND=1 \
   HANCORE_CLIPBOARD_POSITION=bar \
   HANCORE_CLIPBOARD_BAR_HEIGHT="$bar_height" \
-  qs -p "$plugin_dir/apps/hancore-clipboard/shell.qml"
+  qs -p "$plugin_dir/apps/iamcheyan-clipboard/shell.qml"

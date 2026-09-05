@@ -91,7 +91,7 @@ From the plugin repository root:
 omarchy plugin validate .
 qmllint -I "${OMARCHY_PATH:-/usr/share/omarchy}/shell" \
   ClipboardPanel.qml bar/widget.qml \
-  apps/hancore-clipboard/modules/clipboard/ClipboardDialog.qml
+  apps/iamcheyan-clipboard/modules/clipboard/ClipboardDialog.qml
 python3 -m py_compile scripts/*.py
 ```
 
@@ -176,7 +176,7 @@ omarchy plugin add https://github.com/iamcheyan/omarchy-clipboard.git --enable
 omarchy plugin validate .
 qmllint -I "${OMARCHY_PATH:-/usr/share/omarchy}/shell" \
   ClipboardPanel.qml bar/widget.qml \
-  apps/hancore-clipboard/modules/clipboard/ClipboardDialog.qml
+  apps/iamcheyan-clipboard/modules/clipboard/ClipboardDialog.qml
 python3 -m py_compile scripts/*.py
 ```
 
@@ -259,7 +259,7 @@ Omarchy のプラグインマネージャーから無効化または削除して
 omarchy plugin validate .
 qmllint -I "${OMARCHY_PATH:-/usr/share/omarchy}/shell" \
   ClipboardPanel.qml bar/widget.qml \
-  apps/hancore-clipboard/modules/clipboard/ClipboardDialog.qml
+  apps/iamcheyan-clipboard/modules/clipboard/ClipboardDialog.qml
 python3 -m py_compile scripts/*.py
 ```
 

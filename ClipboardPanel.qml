@@ -4,7 +4,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs.Commons
 import qs.Ui
-import "apps/hancore-clipboard/modules/clipboard"
+import "apps/iamcheyan-clipboard/modules/clipboard"
 
 Panel {
     id: root
