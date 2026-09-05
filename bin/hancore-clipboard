@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+action="${1:-toggle-at-bar}"
+bar_height="${2:-32}"
+plugin_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if omarchy-shell clipboard "$action" "$bar_height" >/dev/null 2>&1; then
+    exit 0
+fi
+
+case "$action" in
+  toggle|toggle-at-bar|open|open-at-bar) ;;
+  *) echo "usage: hancore-clipboard [toggle|toggle-at-bar|open|open-at-bar] [bar-height]" >&2; exit 2 ;;
+esac
+
+exec env \
+  HANCORE_CLIPBOARD_ON_DEMAND=1 \
+  HANCORE_CLIPBOARD_POSITION=bar \
+  HANCORE_CLIPBOARD_BAR_HEIGHT="$bar_height" \
+  qs -p "$plugin_dir/apps/hancore-clipboard/shell.qml"

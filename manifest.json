@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "hancore.clipboard",
+  "name": "HANCORE Clipboard",
+  "version": "1.0.0",
+  "author": "HANCORE",
+  "license": "MIT",
+  "description": "A native Omarchy clipboard button using Omarchy's own history and image behavior.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "bar/widget.qml"
+  },
+  "barWidget": {
+    "displayName": "HANCORE Clipboard",
+    "description": "Open the native Omarchy clipboard history from the top bar.",
+    "category": "Productivity",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

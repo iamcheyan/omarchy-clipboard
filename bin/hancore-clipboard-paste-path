@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+path="${1:-}"
+if [[ -z "$path" ]]; then
+  echo "usage: hancore-clipboard-paste-path <path>" >&2
+  exit 1
+fi
+
+# Put the path in the Wayland clipboard as text, then reuse Omarchy's
+# universal terminal/non-terminal paste policy.
+wl-copy --type text/plain < <(printf '%s' "$path")
+sleep 0.15
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../scripts" && pwd)"
+exec python3 "$script_dir/omarchy-universal-paste.py" paste
