@@ -1,10 +1,10 @@
-# iamcheyan Clipboard
+# omarchy-clipboard
 
-iamcheyan Clipboard is an Omarchy bar-widget plugin for browsing and pasting
+omarchy-clipboard is an Omarchy bar-widget plugin for browsing and pasting
 clipboard history. It uses Omarchy's original clipboard implementation as its
 backend and adds a more convenient interface around it.
 
-![iamcheyan Clipboard preview](preview.png)
+![omarchy-clipboard preview](preview.png)
 
 The panel keeps the image preview on the left and the clipboard history on the
 right.
@@ -43,7 +43,7 @@ omarchy plugin add https://github.com/iamcheyan/omarchy-clipboard.git --enable
 ```
 
 The plugin provides a `bar-widget` entry point. If the button is not placed
-automatically, add **iamcheyan Clipboard** to the right side of the top bar.
+automatically, add **omarchy-clipboard** to the right side of the top bar.
 
 Click the clipboard button to open the panel at the bar. Press `Super+Ctrl+V`
 to open it near the mouse pointer. Selecting an item pastes it into the focused
@@ -103,9 +103,9 @@ MIT. See [LICENSE](LICENSE).
 
 # 中文说明
 
-iamcheyan Clipboard 是一个 Omarchy 顶栏剪贴板插件，用于浏览和粘贴剪贴板历史。它使用 Omarchy 原版剪贴板实现作为后端，并在此基础上提供更方便的操作界面。
+omarchy-clipboard 是一个 Omarchy 顶栏剪贴板插件，用于浏览和粘贴剪贴板历史。它使用 Omarchy 原版剪贴板实现作为后端，并在此基础上提供更方便的操作界面。
 
-![iamcheyan Clipboard 预览](preview.png)
+![omarchy-clipboard 预览](preview.png)
 
 面板左侧是图片预览，右侧是剪贴板历史菜单。
 
@@ -137,7 +137,7 @@ iamcheyan Clipboard 是一个 Omarchy 顶栏剪贴板插件，用于浏览和粘
 omarchy plugin add https://github.com/iamcheyan/omarchy-clipboard.git --enable
 ```
 
-插件提供 `bar-widget` 入口。如果按钮没有自动加入顶栏，可以把 **iamcheyan Clipboard** 添加到顶栏右侧。
+插件提供 `bar-widget` 入口。如果按钮没有自动加入顶栏，可以把 **omarchy-clipboard** 添加到顶栏右侧。
 
 点击顶栏剪贴板按钮，会在顶栏固定位置打开面板。按下 `Super+Ctrl+V`，会在鼠标附近打开面板并自动避让。选择条目即可粘贴到当前获得焦点的应用。对于图片，点击条目右侧箭头即可粘贴原生图片文件地址。
 
@@ -188,9 +188,9 @@ MIT，详见 [LICENSE](LICENSE)。
 
 # 日本語
 
-iamcheyan Clipboard は、クリップボード履歴を閲覧して貼り付けるための Omarchy 用トップバープラグインです。バックエンドには Omarchy 標準のクリップボード実装をそのまま使用し、その上に使いやすい操作画面を提供します。
+omarchy-clipboard は、クリップボード履歴を閲覧して貼り付けるための Omarchy 用トップバープラグインです。バックエンドには Omarchy 標準のクリップボード実装をそのまま使用し、その上に使いやすい操作画面を提供します。
 
-![iamcheyan Clipboard プレビュー](preview.png)
+![omarchy-clipboard プレビュー](preview.png)
 
 パネルでは左側に画像プレビュー、右側にクリップボード履歴を表示します。
 
@@ -222,7 +222,7 @@ Omarchy のプラグインマネージャーからインストールします。
 omarchy plugin add https://github.com/iamcheyan/omarchy-clipboard.git --enable
 ```
 
-このプラグインは `bar-widget` エントリーポイントを提供します。ボタンが自動的に配置されない場合は、トップバー右側に **iamcheyan Clipboard** を追加してください。
+このプラグインは `bar-widget` エントリーポイントを提供します。ボタンが自動的に配置されない場合は、トップバー右側に **omarchy-clipboard** を追加してください。
 
 トップバーのボタンをクリックするとバーの固定位置に開きます。`Super+Ctrl+V` ではマウスポインター付近に開き、画面端を避けます。項目を選択するとフォーカス中のアプリケーションへ貼り付けます。画像の場合は行の右端の矢印から、標準の画像ファイルパスを貼り付けられます。
 

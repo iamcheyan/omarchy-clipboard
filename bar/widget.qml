@@ -12,7 +12,7 @@ BarWidget {
     readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
     readonly property string bindingScript: [
         'hl.unbind("SUPER + CTRL + V")',
-        'hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("omarchy-shell iamcheyan.clipboard toggleAtCursor"), { description = "iamcheyan Clipboard" })'
+        'hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("omarchy-shell iamcheyan.clipboard toggleAtCursor"), { description = "omarchy-clipboard" })'
     ].join("; ")
     readonly property string restoreScript: [
         'hl.unbind("SUPER + CTRL + V")',
