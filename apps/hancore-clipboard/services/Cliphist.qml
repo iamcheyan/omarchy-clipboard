@@ -13,7 +13,7 @@ Singleton {
     property double lastPasteAt: 0
     readonly property string historyPath: (Quickshell.env("HOME") || "") + "/.local/state/omarchy/clipboard-history.json"
     readonly property string omarchyPath: Quickshell.env("OMARCHY_PATH") || ""
-    readonly property string pathPasteTool: (Quickshell.env("HOME") || "") + "/.config/omarchy/plugins/hancore.clipboard/bin/hancore-clipboard-paste-path"
+    readonly property string pathPasteTool: Qt.resolvedUrl("../../../bin/hancore-clipboard-paste-path").toString().replace("file://", "")
 
     function pseudo(entry, index) {
         if (entry.type === "image") return index + "\t[[ native image " + String(entry.mime || "image/png") + " ]] " + String(entry.path || "")

@@ -6,12 +6,12 @@ import qs.Ui
 
 BarWidget {
     id: root
-    moduleName: "hancore.clipboard"
+    moduleName: "iamcheyan.clipboard"
 
     readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
     readonly property string bindingScript: [
         'hl.unbind("SUPER + CTRL + V")',
-        'hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("omarchy-shell hancore.clipboard toggleAtCursor"), { description = "Clipboard manager" })'
+        'hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("omarchy-shell iamcheyan.clipboard toggleAtCursor"), { description = "Clipboard manager" })'
     ].join("; ")
     readonly property string restoreScript: [
         'hl.unbind("SUPER + CTRL + V")',
@@ -53,7 +53,7 @@ BarWidget {
     onBarChanged: injectPanel()
 
     IpcHandler {
-        target: "hancore.clipboard"
+        target: "iamcheyan.clipboard"
         function toggleAtCursor(): void { root.opened ? root.close() : root.openAtCursor(); }
         function openAtCursor(): void { root.openAtCursor(); }
         function toggle(): void { root.opened ? root.close() : root.openAtCursor(); }

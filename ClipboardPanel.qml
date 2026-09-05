@@ -8,7 +8,7 @@ import "apps/hancore-clipboard/modules/clipboard"
 
 Panel {
     id: root
-    moduleName: "hancore.clipboard"
+    moduleName: "iamcheyan.clipboard"
     manageIpc: false
     property var anchorItem: null
     property var hostWidget: null
