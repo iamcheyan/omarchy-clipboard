@@ -45,7 +45,26 @@ Singleton {
     function imagePath(entry) { const value = root.nativeFor(entry); return value && value.type === "image" ? String(value.path || "") : "" }
     function fuzzyQuery(query) { const needle = String(query || "").trim().toLowerCase(); return needle ? root.entries.filter(e => root.entryPayload(e).toLowerCase().indexOf(needle) >= 0) : root.entries }
     function claimPaste(entry) { const now = Date.now(); if (entry === root.lastPasteEntry && now - root.lastPasteAt < 900) return false; root.lastPasteEntry = entry; root.lastPasteAt = now; return true }
-    function pasteSmart(entry) { if (!root.claimPaste(entry)) return; const index = root.indexFor(entry); if (index >= 0) Quickshell.execDetached([root.omarchyPath + "/bin/omarchy-clipboard-paste-text", "--shift-insert", "--history-index", String(index)]) }
+    function pasteSmart(entry) {
+        if (!root.claimPaste(entry)) return;
+        const index = root.indexFor(entry);
+        if (index < 0 || index >= root.nativeEntries.length) return;
+
+        const value = root.nativeEntries[index];
+        if (value && value.type === "image" && value.path) {
+            // Images must be copied with the file helper so their binary data
+            // and MIME type are restored to the clipboard before pasting.
+            Quickshell.execDetached([
+                root.omarchyPath + "/bin/omarchy-clipboard-paste-file",
+                String(value.mime || "image/png"),
+                String(value.path)
+            ]);
+            return;
+        }
+
+        if (value && value.type === "text")
+            Quickshell.execDetached([root.omarchyPath + "/bin/omarchy-clipboard-paste-text", "--shift-insert", "--history-index", String(index)]);
+    }
     // The image-row arrow is the explicit text fallback: copy the native
     // image file path as text, then paste it in one operation. Normal row
     // activation still uses Omarchy's native image paste path.
