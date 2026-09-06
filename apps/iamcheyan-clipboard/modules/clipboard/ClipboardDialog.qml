@@ -157,7 +157,10 @@ Item {
             // positionViewAtIndex may have been a no-op on show because the
             // model was still empty; now that data is here, actually position it.
             if (clipboardDialog.visible && clipboardDialog.keyboardIndex === 0 && clipboardList.count > 0)
-                clipboardList.positionViewAtIndex(0, ListView.Beginning);
+                Qt.callLater(() => {
+                    clipboardList.forceLayout();
+                    clipboardList.positionViewAtIndex(0, ListView.Beginning);
+                });
         }
     }
 

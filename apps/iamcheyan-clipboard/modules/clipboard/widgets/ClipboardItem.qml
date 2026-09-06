@@ -20,7 +20,9 @@ Rectangle {
     readonly property bool isFilePath: /^\s*file:\/\//.test(root.cleanText) || /^\s*\//.test(root.cleanText)
     readonly property string cleanText: ClipboardStyle.cleanCliphistEntry(entry)
 
-    implicitHeight: 34
+    // Give ListView a concrete size while its ScriptModel is being replaced.
+    height: 34
+    implicitHeight: height
     color: "transparent"
 
     Rectangle {
@@ -125,4 +127,3 @@ Rectangle {
         }
     }
 }
-
