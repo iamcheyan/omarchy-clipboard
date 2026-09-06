@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "iamcheyan.clipboard",
   "name": "omarchy-clipboard",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "iamcheyan",
   "license": "MIT",
   "description": "A native Omarchy clipboard button using Omarchy's own history and image behavior.",

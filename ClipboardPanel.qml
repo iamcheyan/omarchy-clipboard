@@ -35,6 +35,19 @@ Panel {
     function close() { root.controller.hide(); }
     function toggle() { root.opened ? root.close() : root.open(); }
 
+    // During a monitor hotplug or Hyprland lock transition QsWindow can be
+    // temporarily unavailable. Never let the panel bind to a placeholder
+    // QScreen; that would make Quickshell create a layershell on a non-output.
+    function barScreen() {
+        if (!root.anchorItem || !root.anchorItem.QsWindow || !root.anchorItem.QsWindow.window)
+            return null;
+        return root.anchorItem.QsWindow.window.screen || null;
+    }
+
+    function validScreen(candidate) {
+        return candidate && candidate.name && candidate.width > 0 && candidate.height > 0;
+    }
+
     Process {
         id: cursorPositionProcess
         command: ["hyprctl", "cursorpos", "-j"]
@@ -89,9 +102,12 @@ Panel {
 
     PanelWindow {
         id: clipboardWindow
-        screen: root.cursorMode ? root.cursorScreen
-            : (root.anchorItem && root.anchorItem.QsWindow ? root.anchorItem.QsWindow.window.screen : null)
-        visible: root.opened && (!root.cursorMode || root.cursorReady)
+        property var targetScreen: root.cursorMode ? root.cursorScreen
+            : root.barScreen()
+        screen: targetScreen
+        visible: root.opened
+            && (!root.cursorMode || root.cursorReady)
+            && root.validScreen(targetScreen)
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.namespace: "quickshell:clipboard"
@@ -112,8 +128,8 @@ Panel {
             y: root.cursorMode ? 0 : geometry.cardOrigin.y
             width: root.cursorMode ? clipboardWindow.width : geometry.contentWidth
             height: root.cursorMode ? clipboardWindow.height : geometry.contentHeight
-            screen: clipboardWindow.screen
-            visible: root.opened
+            screen: clipboardWindow.targetScreen
+            visible: clipboardWindow.visible
             show: root.opened
             embedded: !root.cursorMode
             positionMode: root.cursorMode ? "cursor" : "bar"

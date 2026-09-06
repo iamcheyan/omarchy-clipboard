@@ -1,5 +1,10 @@
 # omarchy-clipboard
 
+## 1.0.2
+
+- Avoid binding the panel to a missing or placeholder screen during monitor
+  hotplug and lock transitions.
+
 ## 1.0.1
 
 - Fixed clipboard preview rendering so clipboard content never passes through
