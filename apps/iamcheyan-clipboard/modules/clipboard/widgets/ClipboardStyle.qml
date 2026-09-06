@@ -48,10 +48,6 @@ Singleton {
         }
     }
 
-    function shellSingleQuoteEscape(str) {
-        return String(str).replace(/'/g, "'\\''");
-    }
-
     function cleanCliphistEntry(str: string): string {
         const text = String(str).replace(/^\d+\t/, "");
         // Normalize only the presentation. The original clipboard payload

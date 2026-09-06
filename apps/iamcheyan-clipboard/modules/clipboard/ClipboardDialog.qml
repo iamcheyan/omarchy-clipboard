@@ -5,7 +5,6 @@ import "../../services"
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 
 Item {
     id: clipboardDialog
@@ -52,6 +51,9 @@ Item {
     readonly property string previewEntry: previewRequested && selectedEntry !== "" ? selectedEntry : ""
     readonly property bool previewIsImage: previewEntry !== "" && Cliphist.entryIsImage(previewEntry)
     readonly property bool previewOnLeft: menuCard.x + menuWidth + 10 + previewWidth > width - edgeMargin
+    // Clipboard text is already decoded in the native history model. Keep it
+    // in QML instead of sending attacker-controlled content through a shell.
+    readonly property string previewText: previewIsImage ? "" : Cliphist.entryText(previewEntry)
 
     function clamp(value, minimum, maximum) {
         return Math.max(minimum, Math.min(maximum, value));
@@ -102,19 +104,6 @@ Item {
             Cliphist.deleteEntry(selectedEntry);
     }
 
-    function loadPreview() {
-        if (!previewRequested || previewEntry === "" || previewIsImage) {
-            textDecoder.running = false;
-            textDecoder.decodedText = "";
-            return;
-        }
-        textDecoder.running = false;
-        textDecoder.decodedText = "";
-        textDecoder.command = ["bash", "-c", `printf '${ClipboardStyle.shellSingleQuoteEscape(Cliphist.entryText(previewEntry))}'`];
-        textDecoder.running = true;
-    }
-
-    onPreviewEntryChanged: loadPreview()
     onWidthChanged: if (show) place()
     onHeightChanged: if (show) place()
     onPositionModeChanged: if (show) place()
@@ -169,16 +158,6 @@ Item {
             // model was still empty; now that data is here, actually position it.
             if (clipboardDialog.visible && clipboardDialog.keyboardIndex === 0 && clipboardList.count > 0)
                 clipboardList.positionViewAtIndex(0, ListView.Beginning);
-        }
-    }
-
-
-    Process {
-        id: textDecoder
-        property string decodedText: ""
-        command: ["true"]
-        stdout: StdioCollector {
-            onStreamFinished: textDecoder.decodedText = text
         }
     }
 
@@ -491,7 +470,7 @@ Item {
                     readOnly: true
                     selectByMouse: true
                     wrapMode: TextEdit.Wrap
-                    text: textDecoder.decodedText
+                    text: clipboardDialog.previewText
                     textFormat: TextEdit.PlainText
                     color: ClipboardStyle.fg
                     selectionColor: ClipboardStyle.accent
