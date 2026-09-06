@@ -1,5 +1,11 @@
 # omarchy-clipboard
 
+## 1.0.1
+
+- Fixed clipboard preview rendering so clipboard content never passes through
+  `bash -c` or becomes a shell `printf` format string. Preview text is assigned
+  directly to the plain-text QML editor.
+
 omarchy-clipboard is an Omarchy bar-widget plugin for browsing and pasting
 clipboard history. It uses Omarchy's original clipboard implementation as its
 backend and adds a more convenient interface around it.
