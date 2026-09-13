@@ -195,15 +195,15 @@ Item {
             Keys.onPressed: event => {
             if (event.key === Qt.Key_Down) {
                 event.accepted = true;
-                hoverSuppressed = false;
-                keyboardIndex = Math.min(keyboardIndex + 1, filteredEntries.length - 1);
-                previewRequested = false;
+                clipboardDialog.hoverSuppressed = false;
+                clipboardDialog.keyboardIndex = Math.min(clipboardDialog.keyboardIndex + 1, clipboardDialog.filteredEntries.length - 1);
+                clipboardDialog.previewRequested = false;
                 previewDelay.restart();
             } else if (event.key === Qt.Key_Up) {
                 event.accepted = true;
-                hoverSuppressed = false;
-                keyboardIndex = Math.max(0, keyboardIndex - 1);
-                previewRequested = false;
+                clipboardDialog.hoverSuppressed = false;
+                clipboardDialog.keyboardIndex = Math.max(0, clipboardDialog.keyboardIndex - 1);
+                clipboardDialog.previewRequested = false;
                 previewDelay.restart();
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 event.accepted = true;
@@ -374,7 +374,7 @@ Item {
             // Bottom Thin Divider
             Rectangle {
                 Layout.fillWidth: true
-                height: 1
+                Layout.preferredHeight: 1
                 color: ClipboardStyle.separator
             }
 
