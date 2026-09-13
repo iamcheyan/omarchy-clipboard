@@ -34,6 +34,9 @@ Singleton {
         id: themeFile
         path: root.themePath
         watchChanges: true
+        // The theme file is optional on first launch. The fallback palette is
+        // intentional, so do not emit a noisy FileView warning for absence.
+        printErrors: false
 
         onLoadFailed: error => {
             if (error !== FileViewError.FileNotFound)
