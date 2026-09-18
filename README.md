@@ -88,6 +88,12 @@ installation:
 
 No additional clipboard service is required.
 
+The image-path helper resolves `wl-copy`, `sleep`, `python3`, and `hyprctl`
+only from fixed system directories (`/usr/bin`,
+`/run/current-system/sw/bin`, and `/bin`). It fails closed if a required
+executable is unavailable; it never trusts the ambient `PATH` for this
+clipboard/input path.
+
 ## Uninstallation
 
 Disable or remove the plugin through Omarchy's plugin manager. This removes the

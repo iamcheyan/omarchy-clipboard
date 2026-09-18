@@ -9,13 +9,31 @@ import subprocess
 import sys
 
 
+TRUSTED_EXECUTABLE_DIRS = (
+    "/usr/bin",
+    "/run/current-system/sw/bin",
+    "/bin",
+)
+
+
+def trusted_executable(name: str) -> str:
+    """Resolve a system helper without consulting the ambient PATH."""
+    for directory in TRUSTED_EXECUTABLE_DIRS:
+        candidate = os.path.join(directory, name)
+        if os.access(candidate, os.X_OK):
+            return candidate
+    raise RuntimeError(f"required executable not found in trusted system paths: {name}")
+
+
 def hyprland_environment() -> dict[str, str]:
     environment = dict(os.environ)
     if environment.get("HYPRLAND_INSTANCE_SIGNATURE"):
         return environment
     try:
         instances = json.loads(
-            subprocess.check_output(["hyprctl", "instances", "-j"], text=True)
+            subprocess.check_output(
+                [trusted_executable("hyprctl"), "instances", "-j"], text=True
+            )
         )
         wanted_display = environment.get("WAYLAND_DISPLAY", "")
         selected = next(
@@ -32,7 +50,7 @@ def hyprland_environment() -> dict[str, str]:
 def active_window_is_terminal() -> bool:
     try:
         raw = subprocess.check_output(
-            ["hyprctl", "activewindow", "-j"],
+            [trusted_executable("hyprctl"), "activewindow", "-j"],
             text=True,
             env=hyprland_environment(),
         )
@@ -49,7 +67,7 @@ def send_shortcut(mods: str, key: str, state: str) -> None:
         " })"
     )
     subprocess.run(
-        ["hyprctl", "dispatch", expression],
+        [trusted_executable("hyprctl"), "dispatch", expression],
         check=False,
         env=hyprland_environment(),
         stdout=subprocess.DEVNULL,
