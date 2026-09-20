@@ -30,25 +30,24 @@ ShellRoot {
     property real cursorY: 0
     property real monitorX: 0
     property real monitorY: 0
+    property var cursorScreen: null
+    property bool cursorReady: false
     property bool positionReady: false
     property var cachedMonitors: []
 
     Component.onCompleted: {
-        monitorProc.running = true;
         if (onDemand) {
             GlobalStates.clipboardOpen = true;
             dialog.positionMode = root.initialPosition;
             dialog.barHeight = root.initialBarHeight;
+            // The open state is set before Connections can observe a change,
+            // so explicitly sample the cursor for the on-demand process.
+            Qt.callLater(root.updateCursorPosition);
         }
     }
 
     function updateCursorPosition() {
-        if (!root.isHyprland) {
-            // No cursor IPC on wlroots: only resolve the monitor layout.
-            // applyMonitor() also downgrades cursor mode to bar placement.
-            root.resolveMonitor();
-            return;
-        }
+        root.cursorReady = false;
         positionReady = false;
         cursorPositionProc.running = false;
         cursorPositionProc.running = true;
@@ -56,19 +55,34 @@ ShellRoot {
 
     Process {
         id: cursorPositionProc
-        command: ["hyprctl", "cursorpos", "-j"]
+        command: ["/run/current-system/sw/bin/hyprctl", "cursorpos", "-j"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
-                    const position = JSON.parse(text);
+                    const position = JSON.parse((text || "").trim());
                     root.cursorX = Number(position.x) || 0;
                     root.cursorY = Number(position.y) || 0;
+                    root.cursorReady = true;
+                    monitorProc.running = false;
+                    monitorProc.running = true;
                     root.resolveMonitor();
                 } catch (error) {
                     console.warn("[Clipboard] Could not read cursor position:", error);
-                    root.positionReady = true;
+                    cursorRetry.restart();
                 }
             }
+        }
+        onExited: if (!root.cursorReady && GlobalStates.clipboardOpen)
+            cursorRetry.restart()
+    }
+
+    Timer {
+        id: cursorRetry
+        interval: 150
+        repeat: false
+        onTriggered: if (GlobalStates.clipboardOpen) {
+            cursorPositionProc.running = false;
+            cursorPositionProc.running = true;
         }
     }
 
@@ -82,6 +96,8 @@ ShellRoot {
     }
 
     function applyMonitor(monitors) {
+        if (root.isHyprland && !root.cursorReady)
+            return;
         // wlroots compositors cannot report the pointer position, so cursor
         // mode falls back to the bar anchor. Must run before positionReady is
         // set: the window must never become visible in cursor mode on labwc.
@@ -103,12 +119,29 @@ ShellRoot {
                 root.monitorX = Number(monitor.x) || 0;
                 root.monitorY = Number(monitor.y) || 0;
                 const screens = Quickshell.screens;
+                let matchedScreen = null;
                 for (let index = 0; index < screens.length; index++) {
                     if (screens[index].name === monitor.name) {
-                        clipboardWindow.screen = screens[index];
+                        matchedScreen = screens[index];
                         break;
                     }
                 }
+                if (!matchedScreen) {
+                    const rotated = monitor.transform === 1 || monitor.transform === 3
+                        || monitor.transform === 5 || monitor.transform === 7;
+                    const scale = Number(monitor.scale) || 1;
+                    const logicalWidth = (rotated ? monitor.height : monitor.width) / scale;
+                    const logicalHeight = (rotated ? monitor.width : monitor.height) / scale;
+                    for (let index = 0; index < screens.length; index++) {
+                        if (Math.abs(screens[index].width - logicalWidth) < 2
+                                && Math.abs(screens[index].height - logicalHeight) < 2) {
+                            matchedScreen = screens[index];
+                            break;
+                        }
+                    }
+                }
+                if (matchedScreen)
+                    root.cursorScreen = matchedScreen;
             }
         } catch (error) {
             console.warn("[Clipboard] Could not resolve cursor monitor:", error);
@@ -122,18 +155,20 @@ ShellRoot {
     // wlr-randr (wlroots compositors: labwc, sway, ...).
     Process {
         id: monitorProc
-        command: ["hyprctl", "monitors", "-j"]
+        command: ["/run/current-system/sw/bin/hyprctl", "monitors", "-j"]
         stdout: StdioCollector {
             onStreamFinished: {
                 let monitors = [];
                 try {
-                    const parsed = JSON.parse(text);
+                    const parsed = JSON.parse((text || "").trim());
                     if (Array.isArray(parsed) && parsed.length > 0) {
                         root.isHyprland = true;
                         monitors = parsed;
                     }
                 } catch (error) {
-                    console.warn("[Clipboard] hyprctl monitors unavailable, falling back to wlr-randr:", error);
+                    console.warn("[Clipboard] hyprctl monitors not ready, retrying:", error);
+                    monitorRetry.restart();
+                    return;
                 }
                 if (root.isHyprland) {
                     root.cachedMonitors = monitors;
@@ -143,6 +178,18 @@ ShellRoot {
                     wlrMonitorProc.running = true;
                 }
             }
+        }
+        onExited: if (!root.isHyprland)
+            monitorRetry.restart()
+    }
+
+    Timer {
+        id: monitorRetry
+        interval: 150
+        repeat: false
+        onTriggered: if (!root.isHyprland) {
+            monitorProc.running = false;
+            monitorProc.running = true;
         }
     }
 
@@ -247,6 +294,10 @@ ShellRoot {
 
     PanelWindow {
         id: clipboardWindow
+        // Keep this as a binding instead of assigning PanelWindow.screen after
+        // creation. Wayland layershell output selection happens at creation;
+        // a later imperative assignment can leave the layer on screen 1.
+        screen: root.cursorScreen
         visible: GlobalStates.clipboardOpen && root.positionReady
 
         anchors {
@@ -293,4 +344,3 @@ ShellRoot {
         }
     }
 }
-
