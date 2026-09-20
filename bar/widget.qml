@@ -10,9 +10,12 @@ BarWidget {
     moduleName: "iamcheyan.clipboard"
 
     readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
+    readonly property string launcherPath: Qt.resolvedUrl("../bin/iamcheyan-clipboard").toString().replace("file://", "")
     readonly property string bindingScript: [
         'hl.unbind("SUPER + CTRL + V")',
-        'hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("omarchy-shell iamcheyan.clipboard toggleAtCursor"), { description = "omarchy-clipboard" })'
+        // The launcher remains usable when the widget IPC handler disappears
+        // briefly during a Quickshell reload.
+        `hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("${root.launcherPath} toggle-at-cursor"), { description = "omarchy-clipboard" })`
     ].join("; ")
     readonly property string restoreScript: [
         'hl.unbind("SUPER + CTRL + V")',
@@ -33,7 +36,7 @@ BarWidget {
 
     Timer {
         id: bindingEnsureDelay
-        interval: 1200
+        interval: 250
         repeat: false
         onTriggered: root.applyBinding()
     }

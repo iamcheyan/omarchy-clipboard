@@ -1,5 +1,12 @@
 # omarchy-clipboard
 
+## Unreleased
+
+- Make `Super+Ctrl+V` resilient to Quickshell reloads. The runtime binding now
+  calls the plugin launcher, which can start the on-demand panel when the
+  widget's IPC handler is temporarily unavailable.
+- Reapply the binding shortly after a Hyprland configuration reload.
+
 ## 1.0.2
 
 - Avoid binding the panel to a missing or placeholder screen during monitor
@@ -60,6 +67,20 @@ Click the clipboard button to open the panel at the bar. Press `Super+Ctrl+V`
 to open it near the mouse pointer. Selecting an item pastes it into the focused
 application. For an image, click the arrow on the right side of its row to
 paste the native image file path instead.
+
+## Shortcut recovery after a shell reload
+
+The shortcut is installed at runtime by the bar widget. `Super+Ctrl+V` invokes
+the plugin's `bin/iamcheyan-clipboard` launcher rather than depending only on a
+live Quickshell IPC handler. If the shell is reloaded, the widget reapplies the
+binding after Hyprland finishes reloading. If the IPC handler is still
+unavailable, the launcher starts an on-demand cursor-positioned panel.
+
+To manually refresh the shell after changing plugin files:
+
+```sh
+omarchy restart shell
+```
 
 ## Omarchy native integration
 
@@ -158,6 +179,19 @@ omarchy plugin add https://github.com/iamcheyan/omarchy-clipboard.git --enable
 
 点击顶栏剪贴板按钮，会在顶栏固定位置打开面板。按下 `Super+Ctrl+V`，会在鼠标附近打开面板并自动避让。选择条目即可粘贴到当前获得焦点的应用。对于图片，点击条目右侧箭头即可粘贴原生图片文件地址。
 
+## Shell 重载后的快捷键恢复
+
+快捷键由顶栏 widget 在运行时注册。`Super+Ctrl+V` 现在调用插件自己的
+`bin/iamcheyan-clipboard` launcher，不再只依赖当前 Quickshell IPC handler。
+Shell 重载时，widget 会在 Hyprland 重载完成后重新注册快捷键；如果 IPC
+handler 暂时仍不可用，launcher 会自动启动一个跟随鼠标位置的 on-demand 面板。
+
+修改插件文件后可以手动刷新 Shell：
+
+```sh
+omarchy restart shell
+```
+
 ## 与 Omarchy 原生实现的关系
 
 插件有意复用 Omarchy 已有的状态和辅助脚本：
@@ -242,6 +276,20 @@ omarchy plugin add https://github.com/iamcheyan/omarchy-clipboard.git --enable
 このプラグインは `bar-widget` エントリーポイントを提供します。ボタンが自動的に配置されない場合は、トップバー右側に **omarchy-clipboard** を追加してください。
 
 トップバーのボタンをクリックするとバーの固定位置に開きます。`Super+Ctrl+V` ではマウスポインター付近に開き、画面端を避けます。項目を選択するとフォーカス中のアプリケーションへ貼り付けます。画像の場合は行の右端の矢印から、標準の画像ファイルパスを貼り付けられます。
+
+## Shell 再読み込み後のショートカット復旧
+
+ショートカットはトップバー widget が実行時に登録します。`Super+Ctrl+V`
+は現在、実行中の Quickshell IPC handler だけに依存せず、プラグイン自身の
+`bin/iamcheyan-clipboard` launcher を呼び出します。Shell の再読み込み時は
+Hyprland の再読み込み完了後に widget がバインドを再登録し、IPC handler が
+一時的に利用できない場合も launcher がカーソル位置の on-demand パネルを起動します。
+
+プラグインファイルを変更した後は、次のコマンドで Shell を手動更新できます。
+
+```sh
+omarchy restart shell
+```
 
 ## Omarchy 標準機能との統合
 
