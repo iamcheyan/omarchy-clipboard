@@ -10,20 +10,39 @@ case "$action" in
   *) echo "usage: iamcheyan-clipboard [toggle|toggle-at-bar|open|open-at-bar|toggle-at-cursor|open-at-cursor] [bar-height]" >&2; exit 2 ;;
 esac
 
+# Prefer the panel hosted by Omarchy's bar. IPC methods use camelCase;
+# launcher actions use hyphenated names for the command-line interface.
+case "$action" in
+  toggle|toggle-at-bar) host_method="toggleAtBar"; standalone_method="toggleAtBar" ;;
+  open|open-at-bar) host_method="openAtBar"; standalone_method="openAtBar" ;;
+  toggle-at-cursor) host_method="toggleAtCursor"; standalone_method="toggle" ;;
+  open-at-cursor) host_method="openAtCursor"; standalone_method="open" ;;
+esac
+
+# qs can exit successfully while reporting a missing IPC target or method.
+# Only stop here when the requested handler actually accepted the call.
+ipc_call() {
+  local output
+  output="$(timeout 2s "$@" 2>&1)" || return 1
+  case "$output" in
+    *"Target not found."*|*"Function not found."*|*"Too few arguments provided"*|*"Too many arguments provided"*|*"Not ready to accept queries yet"*) return 1 ;;
+  esac
+}
+
+if ipc_call omarchy-shell iamcheyan.clipboard "$host_method"; then
+  exit 0
+fi
+
 config_path="$plugin_dir/apps/iamcheyan-clipboard/shell.qml"
 existing_pid="$(ps -eo pid=,comm=,args= | awk -v config="$config_path" '$2 ~ /quickshell/ && index($0, config) { print $1; exit }')"
 if [[ -n "$existing_pid" ]]; then
-  case "$action" in
-    open|open-at-cursor|open-at-bar) ipc_function="open" ;;
-    *) ipc_function="toggle" ;;
-  esac
-  if timeout 2s qs ipc --pid "$existing_pid" call clipboard "$ipc_function" >/dev/null 2>&1; then
+  standalone_args=()
+  if [[ "$standalone_method" == *AtBar ]]; then
+    standalone_args+=("$bar_height")
+  fi
+  if ipc_call qs ipc --pid "$existing_pid" call clipboard "$standalone_method" "${standalone_args[@]}"; then
     exit 0
   fi
-fi
-
-if timeout 2s omarchy-shell clipboard "$action" "$bar_height" >/dev/null 2>&1; then
-    exit 0
 fi
 
 position="bar"

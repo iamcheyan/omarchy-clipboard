@@ -69,7 +69,7 @@ Panel {
 
     Process {
         id: cursorPositionProcess
-        command: ["/run/current-system/sw/bin/hyprctl", "cursorpos", "-j"]
+        command: ["hyprctl", "cursorpos", "-j"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
@@ -108,7 +108,7 @@ Panel {
     // selects the matching layershell screen.
     Process {
         id: monitorPositionProcess
-        command: ["/run/current-system/sw/bin/hyprctl", "monitors", "-j"]
+        command: ["hyprctl", "monitors", "-j"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {

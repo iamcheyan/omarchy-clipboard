@@ -15,7 +15,7 @@ BarWidget {
         'hl.unbind("SUPER + CTRL + V")',
         // The launcher remains usable when the widget IPC handler disappears
         // briefly during a Quickshell reload.
-        `hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("${root.launcherPath} toggle-at-cursor"), { description = "omarchy-clipboard" })`
+        `hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("${root.launcherPath} toggle-at-bar"), { description = "omarchy-clipboard" })`
     ].join("; ")
     readonly property string restoreScript: [
         'hl.unbind("SUPER + CTRL + V")',
@@ -80,6 +80,8 @@ BarWidget {
 
     IpcHandler {
         target: "iamcheyan.clipboard"
+        function toggleAtBar(): void { root.toggleAtBar(); }
+        function openAtBar(): void { root.openAtBar(); }
         function toggleAtCursor(): void { root.opened ? root.close() : root.openAtCursor(); }
         function openAtCursor(): void { root.openAtCursor(); }
         function toggle(): void { root.opened ? root.close() : root.openAtCursor(); }

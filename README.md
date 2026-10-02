@@ -36,16 +36,15 @@ paste helpers, and native terminal/GUI paste behavior.
 It adds two conveniences:
 
 - The image row has an action for pasting the image's source file path as text.
-- `Super+Ctrl+V` opens the panel at the mouse pointer and uses the same edge
-  avoidance behavior as Omarchy's original cursor-based panel placement. The
-  top-bar button continues to open it from the fixed bar position.
+- `Super+Ctrl+V` and the top-bar button both open the panel at its bar anchor.
+  Explicit cursor-positioned launcher actions remain available.
 
 ## Features
 
 - Native Omarchy text and image clipboard history.
 - Native Omarchy image storage and paste behavior.
 - Top-bar clipboard button using Omarchy's bar integration.
-- Cursor-positioned shortcut with automatic screen-edge avoidance.
+- Bar-anchored shortcut matching the top-bar button.
 - Image preview on the left and history menu on the right.
 - Image file-path paste from the arrow action on an image row.
 - Display-only cleanup of leading whitespace and punctuation-only entries;
@@ -72,7 +71,7 @@ The plugin provides a `bar-widget` entry point. If the button is not placed
 automatically, add **omarchy-clipboard** to the right side of the top bar.
 
 Click the clipboard button to open the panel at the bar. Press `Super+Ctrl+V`
-to open it near the mouse pointer. Selecting an item pastes it into the focused
+to open it at the same bar anchor. Selecting an item pastes it into the focused
 application. For an image, click the arrow on the right side of its row to
 paste the native image file path instead.
 
@@ -82,7 +81,7 @@ The shortcut is installed at runtime by the bar widget. `Super+Ctrl+V` invokes
 the plugin's `bin/iamcheyan-clipboard` launcher rather than depending only on a
 live Quickshell IPC handler. If the shell is reloaded, the widget reapplies the
 binding after Hyprland finishes reloading. If the IPC handler is still
-unavailable, the launcher starts an on-demand cursor-positioned panel.
+unavailable, the launcher starts an on-demand bar-positioned panel.
 
 To manually refresh the shell after changing plugin files:
 
@@ -139,6 +138,7 @@ qmllint -I "${OMARCHY_PATH:-/usr/share/omarchy}/shell" \
   ClipboardPanel.qml bar/widget.qml \
   apps/iamcheyan-clipboard/modules/clipboard/ClipboardDialog.qml
 python3 -m py_compile scripts/*.py
+python3 -m unittest discover -s tests -v
 ```
 
 ## License
@@ -162,14 +162,14 @@ omarchy-clipboard 是一个 Omarchy 顶栏剪贴板插件，用于浏览和粘�
 插件额外提供两个便利功能：
 
 - 图片条目增加“把图片源文件地址作为文本粘贴”的操作。
-- 按下 `Super+Ctrl+V` 时，面板会出现在鼠标光标附近，并使用与 Omarchy 原版光标面板相同的屏幕边缘避让逻辑。点击顶栏按钮时，仍然从顶栏固定位置打开。
+- 按下 `Super+Ctrl+V` 和点击顶栏按钮时，面板均从顶栏固定位置打开；launcher 仍支持显式的光标位置操作。
 
 ## 功能
 
 - 使用 Omarchy 原生的文本和图片剪贴板历史。
 - 使用 Omarchy 原生的图片存储和粘贴行为。
 - 在顶栏提供剪贴板按钮，并使用 Omarchy 的顶栏集成。
-- 快捷键打开时跟随光标，并自动避开屏幕边缘。
+- 快捷键和顶栏按钮使用相同的固定顶栏位置。
 - 左侧图片预览、右侧历史菜单。
 - 点击图片条目右侧箭头，把图片文件地址粘贴为文本。
 - 只在显示层清理行首空白、隐藏只有标点符号的条目，不修改原生历史数据。
@@ -185,14 +185,14 @@ omarchy plugin add https://github.com/iamcheyan/omarchy-clipboard.git --enable
 
 插件提供 `bar-widget` 入口。如果按钮没有自动加入顶栏，可以把 **omarchy-clipboard** 添加到顶栏右侧。
 
-点击顶栏剪贴板按钮，会在顶栏固定位置打开面板。按下 `Super+Ctrl+V`，会在鼠标附近打开面板并自动避让。选择条目即可粘贴到当前获得焦点的应用。对于图片，点击条目右侧箭头即可粘贴原生图片文件地址。
+点击顶栏剪贴板按钮，会在顶栏固定位置打开面板。按下 `Super+Ctrl+V`，也会从相同的顶栏位置打开面板。选择条目即可粘贴到当前获得焦点的应用。对于图片，点击条目右侧箭头即可粘贴原生图片文件地址。
 
 ## Shell 重载后的快捷键恢复
 
 快捷键由顶栏 widget 在运行时注册。`Super+Ctrl+V` 现在调用插件自己的
 `bin/iamcheyan-clipboard` launcher，不再只依赖当前 Quickshell IPC handler。
 Shell 重载时，widget 会在 Hyprland 重载完成后重新注册快捷键；如果 IPC
-handler 暂时仍不可用，launcher 会自动启动一个跟随鼠标位置的 on-demand 面板。
+handler 暂时仍不可用，launcher 会自动启动一个固定在顶栏位置的 on-demand 面板。
 
 修改插件文件后可以手动刷新 Shell：
 
@@ -237,6 +237,7 @@ qmllint -I "${OMARCHY_PATH:-/usr/share/omarchy}/shell" \
   ClipboardPanel.qml bar/widget.qml \
   apps/iamcheyan-clipboard/modules/clipboard/ClipboardDialog.qml
 python3 -m py_compile scripts/*.py
+python3 -m unittest discover -s tests -v
 ```
 
 ## 许可证
@@ -260,14 +261,14 @@ omarchy-clipboard は、クリップボード履歴を閲覧して貼り付け�
 追加する便利な機能は次の二つです。
 
 - 画像行に、画像の元ファイルパスをテキストとして貼り付ける操作を追加します。
-- `Super+Ctrl+V` ではマウスポインター付近にパネルを開き、Omarchy 標準のカーソル位置パネルと同じ画面端回避を行います。トップバーのボタンから開く場合は、従来どおり固定されたバー位置を使います。
+- `Super+Ctrl+V` とトップバーのボタンは、同じ固定されたバー位置にパネルを開きます。launcher の明示的なカーソル位置操作は引き続き利用できます。
 
 ## 主な機能
 
 - Omarchy 標準のテキスト・画像クリップボード履歴。
 - Omarchy 標準の画像保存と貼り付け動作。
 - Omarchy のトップバー統合を使うクリップボードボタン。
-- ショートカット使用時はカーソル位置に表示し、画面端を自動回避。
+- ショートカットとトップバーのボタンで同じバー位置に表示。
 - 左側の画像プレビューと右側の履歴メニュー。
 - 画像行の矢印から画像ファイルパスをテキストとして貼り付け。
 - 表示時だけ行頭の空白を整理し、句読点だけの項目を非表示。標準の履歴データは変更しません。
@@ -283,7 +284,7 @@ omarchy plugin add https://github.com/iamcheyan/omarchy-clipboard.git --enable
 
 このプラグインは `bar-widget` エントリーポイントを提供します。ボタンが自動的に配置されない場合は、トップバー右側に **omarchy-clipboard** を追加してください。
 
-トップバーのボタンをクリックするとバーの固定位置に開きます。`Super+Ctrl+V` ではマウスポインター付近に開き、画面端を避けます。項目を選択するとフォーカス中のアプリケーションへ貼り付けます。画像の場合は行の右端の矢印から、標準の画像ファイルパスを貼り付けられます。
+トップバーのボタンをクリックするとバーの固定位置に開きます。`Super+Ctrl+V` でも同じバー位置に開きます。項目を選択するとフォーカス中のアプリケーションへ貼り付けます。画像の場合は行の右端の矢印から、標準の画像ファイルパスを貼り付けられます。
 
 ## Shell 再読み込み後のショートカット復旧
 
@@ -291,7 +292,7 @@ omarchy plugin add https://github.com/iamcheyan/omarchy-clipboard.git --enable
 は現在、実行中の Quickshell IPC handler だけに依存せず、プラグイン自身の
 `bin/iamcheyan-clipboard` launcher を呼び出します。Shell の再読み込み時は
 Hyprland の再読み込み完了後に widget がバインドを再登録し、IPC handler が
-一時的に利用できない場合も launcher がカーソル位置の on-demand パネルを起動します。
+一時的に利用できない場合も launcher がバー位置の on-demand パネルを起動します。
 
 プラグインファイルを変更した後は、次のコマンドで Shell を手動更新できます。
 
@@ -334,6 +335,7 @@ qmllint -I "${OMARCHY_PATH:-/usr/share/omarchy}/shell" \
   ClipboardPanel.qml bar/widget.qml \
   apps/iamcheyan-clipboard/modules/clipboard/ClipboardDialog.qml
 python3 -m py_compile scripts/*.py
+python3 -m unittest discover -s tests -v
 ```
 
 ## ライセンス

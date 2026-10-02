@@ -65,7 +65,7 @@ ShellRoot {
 
     Process {
         id: cursorPositionProc
-        command: ["/run/current-system/sw/bin/hyprctl", "cursorpos", "-j"]
+        command: ["hyprctl", "cursorpos", "-j"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
@@ -165,7 +165,7 @@ ShellRoot {
     // wlr-randr (wlroots compositors: labwc, sway, ...).
     Process {
         id: monitorProc
-        command: ["/run/current-system/sw/bin/hyprctl", "monitors", "-j"]
+        command: ["hyprctl", "monitors", "-j"]
         stdout: StdioCollector {
             onStreamFinished: {
                 let monitors = [];
