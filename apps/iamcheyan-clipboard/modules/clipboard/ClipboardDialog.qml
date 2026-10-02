@@ -100,8 +100,19 @@ Item {
     }
 
     function deleteSelected() {
-        if (selectedEntry !== "")
-            Cliphist.deleteEntry(selectedEntry);
+        if (selectedEntry === "")
+            return;
+        // Removing/reusing delegates can trigger hover changes under a
+        // stationary pointer. Keep deletion on the keyboard-selected row.
+        hoverSuppressed = true;
+        hoveredIndex = -1;
+        previewDelay.stop();
+        previewRequested = false;
+        Cliphist.deleteEntry(selectedEntry);
+        keyboardIndex = Math.min(keyboardIndex, Math.max(0, filteredEntries.length - 1));
+        if (filteredEntries.length > 0)
+            previewDelay.restart();
+        searchField.forceActiveFocus();
     }
 
     onWidthChanged: if (show) place()

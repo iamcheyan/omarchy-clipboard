@@ -76,8 +76,27 @@ Singleton {
         if (value && value.type === "image" && value.path)
             Quickshell.execDetached([root.pathPasteTool, String(value.path)]);
     }
-    function deleteEntry(entry) { const index = root.indexFor(entry); if (index < 0 || index >= root.nativeEntries.length) return; const next = root.nativeEntries.slice(); next.splice(index, 1); historyFile.setText(JSON.stringify(next, null, 2) + "\n") }
-    function wipe() { historyFile.setText("[]\n") }
+    function saveEntries(next) {
+        const raw = JSON.stringify(next, null, 2) + "\n";
+        // setText updates FileView's cache; it need not emit onLoaded or a
+        // file-watch event for our own write. Publish the model immediately.
+        root.rebuild(raw);
+        historyFile.setText(raw);
+    }
+    function deleteEntry(entry) {
+        const index = root.indexFor(entry);
+        if (index < 0 || index >= root.nativeEntries.length)
+            return false;
+        // Reject a delegate from an older model rather than remove whatever
+        // now happens to occupy its numeric index.
+        if (root.pseudo(root.nativeEntries[index], index) !== entry)
+            return false;
+        const next = root.nativeEntries.slice();
+        next.splice(index, 1);
+        root.saveEntries(next);
+        return true;
+    }
+    function wipe() { root.saveEntries([]); }
     function setDialogVisible(visible) { if (visible) root.refresh() }
     signal changed()
 
