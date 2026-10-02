@@ -52,6 +52,14 @@ It adds two conveniences:
   native history data is not changed.
 - No `cliphist`, replacement clipboard watcher, or second clipboard daemon.
 
+## Theming
+
+The panels follow Omarchy's active menu colors, selected-row colors, control
+styles, corner rounding, and menu font sizes. Outer borders use Omarchy's
+popup border styling, including gradients and per-side widths in the hosted
+panel. Theme and font changes apply
+through Omarchy's shared style tokens, including in the standalone fallback.
+
 ## Installation
 
 Install the plugin with Omarchy's plugin manager:

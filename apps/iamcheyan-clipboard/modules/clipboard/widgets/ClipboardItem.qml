@@ -33,7 +33,7 @@ Rectangle {
             topMargin: 2
             bottomMargin: 2
         }
-        radius: 6
+        radius: ClipboardStyle.radius
         color: root.selected ? ClipboardStyle.surfaceSelected : mouseArea.containsMouse ? ClipboardStyle.surfaceHover : "transparent"
         visible: root.selected || mouseArea.containsMouse
     }
@@ -67,23 +67,23 @@ Rectangle {
 
         StyledText {
             visible: root.isImage
-            Layout.preferredWidth: 18
+            Layout.preferredWidth: Math.max(18, implicitWidth)
             Layout.alignment: Qt.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            text: "image"
-            font.family: "Material Symbols Rounded"
-            font.pixelSize: 15
+            text: "󰋩"
+            font.family: ClipboardStyle.fontFamily
+            font.pixelSize: ClipboardStyle.fontTitle
             color: ClipboardStyle.dim
         }
 
         StyledText {
             visible: root.isFilePath
-            Layout.preferredWidth: 18
+            Layout.preferredWidth: Math.max(18, implicitWidth)
             Layout.alignment: Qt.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            text: "description"
-            font.family: "Material Symbols Rounded"
-            font.pixelSize: 15
+            text: "󰈔"
+            font.family: ClipboardStyle.fontFamily
+            font.pixelSize: ClipboardStyle.fontTitle
             color: ClipboardStyle.dim
         }
 
@@ -93,9 +93,9 @@ Rectangle {
             textFormat: Text.PlainText
             elide: Text.ElideRight
             maximumLineCount: 1
-            color: ClipboardStyle.fg
+            color: root.selected ? ClipboardStyle.selectedText : ClipboardStyle.fg
             font.family: ClipboardStyle.fontFamily
-            font.pixelSize: 14
+            font.pixelSize: ClipboardStyle.fontTitle
         }
 
         Rectangle {
@@ -104,13 +104,13 @@ Rectangle {
             Layout.preferredHeight: 20
             Layout.alignment: Qt.AlignVCenter
             color: pathMouse.containsMouse ? ClipboardStyle.accentSoft : "transparent"
-            radius: 4
+            radius: ClipboardStyle.radius
 
             StyledText {
                 anchors.centerIn: parent
                 text: "⇲"
                 font.family: ClipboardStyle.fontFamily
-                font.pixelSize: 16
+                font.pixelSize: ClipboardStyle.fontHeading
                 color: pathMouse.containsMouse ? ClipboardStyle.accent : ClipboardStyle.dim
             }
 

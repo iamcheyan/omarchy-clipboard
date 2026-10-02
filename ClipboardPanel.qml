@@ -5,9 +5,22 @@ import Quickshell.Wayland
 import qs.Commons
 import qs.Ui
 import "apps/iamcheyan-clipboard/modules/clipboard"
+import "apps/iamcheyan-clipboard/modules/clipboard/widgets"
 
 Panel {
     id: root
+    Component.onCompleted: {
+        ClipboardStyle.palette = Color;
+        ClipboardStyle.style = Style;
+        ClipboardStyle.borderTokens = Border;
+        ClipboardStyle.panelBorderComponent = nativePanelBorder;
+    }
+
+    Component {
+        id: nativePanelBorder
+        BorderOverlay { }
+    }
+
     moduleName: "iamcheyan.clipboard"
     manageIpc: false
     property var anchorItem: null
