@@ -35,7 +35,17 @@ ShellRoot {
     property bool positionReady: false
     property var cachedMonitors: []
 
+    property var themeBridge: null
+
     Component.onCompleted: {
+        const shellPath = Quickshell.env("OMARCHY_PATH") || "/usr/share/omarchy";
+        root.themeBridge = Qt.createQmlObject(
+            'import QtQml; import ' + JSON.stringify('file://' + shellPath + '/shell/Commons')
+            + ' as Omarchy; QtObject { readonly property var palette: Omarchy.Color; readonly property var style: Omarchy.Style; readonly property var borders: Omarchy.Border }',
+            root, "ClipboardThemeBridge");
+        ClipboardStyle.palette = root.themeBridge.palette;
+        ClipboardStyle.style = root.themeBridge.style;
+        ClipboardStyle.borderTokens = root.themeBridge.borders;
         if (onDemand) {
             GlobalStates.clipboardOpen = true;
             dialog.positionMode = root.initialPosition;
@@ -55,7 +65,7 @@ ShellRoot {
 
     Process {
         id: cursorPositionProc
-        command: ["/run/current-system/sw/bin/hyprctl", "cursorpos", "-j"]
+        command: ["hyprctl", "cursorpos", "-j"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
@@ -155,7 +165,7 @@ ShellRoot {
     // wlr-randr (wlroots compositors: labwc, sway, ...).
     Process {
         id: monitorProc
-        command: ["/run/current-system/sw/bin/hyprctl", "monitors", "-j"]
+        command: ["hyprctl", "monitors", "-j"]
         stdout: StdioCollector {
             onStreamFinished: {
                 let monitors = [];

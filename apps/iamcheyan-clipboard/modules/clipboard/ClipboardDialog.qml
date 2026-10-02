@@ -100,8 +100,19 @@ Item {
     }
 
     function deleteSelected() {
-        if (selectedEntry !== "")
-            Cliphist.deleteEntry(selectedEntry);
+        if (selectedEntry === "")
+            return;
+        // Removing/reusing delegates can trigger hover changes under a
+        // stationary pointer. Keep deletion on the keyboard-selected row.
+        hoverSuppressed = true;
+        hoveredIndex = -1;
+        previewDelay.stop();
+        previewRequested = false;
+        Cliphist.deleteEntry(selectedEntry);
+        keyboardIndex = Math.min(keyboardIndex, Math.max(0, filteredEntries.length - 1));
+        if (filteredEntries.length > 0)
+            previewDelay.restart();
+        searchField.forceActiveFocus();
     }
 
     onWidthChanged: if (show) place()
@@ -186,10 +197,21 @@ Item {
         width: clipboardDialog.menuWidth
         height: clipboardDialog.menuHeight
         color: ClipboardStyle.panel
-        border.color: ClipboardStyle.line
-        border.width: 1
+        border.color: ClipboardStyle.panelBorderComponent ? "transparent" : ClipboardStyle.panelBorderColor
+        border.width: ClipboardStyle.panelBorderComponent ? 0 : ClipboardStyle.panelBorderWidth
         radius: ClipboardStyle.radius
         clip: true
+
+        Loader {
+            anchors.fill: parent
+            z: 10
+            sourceComponent: ClipboardStyle.panelBorderComponent
+            onLoaded: {
+                item.borderSpec = Qt.binding(() => ClipboardStyle.panelBorderSpec);
+                item.radius = Qt.binding(() => ClipboardStyle.radius);
+            }
+        }
+
         focus: true
 
             Keys.onPressed: event => {
@@ -247,10 +269,10 @@ Item {
                         topMargin: 10
                         bottomMargin: 6
                     }
-                    radius: 6
+                    radius: ClipboardStyle.radius
                     color: ClipboardStyle.surface
                     border.width: 1
-                    border.color: ClipboardStyle.line
+                    border.color: ClipboardStyle.controlBorder
 
                     RowLayout {
                         anchors.fill: parent
@@ -259,20 +281,20 @@ Item {
                         spacing: 6
 
                         StyledText {
-                            text: "search"
-                            font.family: "Material Symbols Rounded"
-                            font.pixelSize: 16
+                            text: "󰍉"
+                            font.family: ClipboardStyle.fontFamily
+                            font.pixelSize: ClipboardStyle.fontHeading
                             color: ClipboardStyle.dim
                         }
 
                         TextInput {
                             id: searchField
                             Layout.fillWidth: true
+                            selectionColor: ClipboardStyle.surfaceSelected
+                            selectedTextColor: ClipboardStyle.selectedText
                             color: ClipboardStyle.fg
-                            selectionColor: ClipboardStyle.accent
-                            selectedTextColor: ClipboardStyle.bg
                             font.family: ClipboardStyle.fontFamily
-                            font.pixelSize: 13
+                            font.pixelSize: ClipboardStyle.fontSubtitle
                             verticalAlignment: TextInput.AlignVCenter
                             clip: true
                             onTextChanged: {
@@ -309,7 +331,7 @@ Item {
                                 visible: parent.text.length === 0
                                 text: "Type to search..."
                                 color: ClipboardStyle.muted
-                                font.pixelSize: 13
+                                font.pixelSize: ClipboardStyle.fontSubtitle
                             }
                         }
                     }
@@ -359,7 +381,7 @@ Item {
                     visible: clipboardList.count === 0
                     text: clipboardDialog.searchText.length > 0 ? "No matches" : "Clipboard is empty"
                     color: ClipboardStyle.dim
-                    font.pixelSize: 14
+                    font.pixelSize: ClipboardStyle.fontTitle
                 }
 
                 Connections {
@@ -391,7 +413,7 @@ Item {
                     StyledText {
                         text: "Clear history"
                         color: clearMouse.containsMouse ? ClipboardStyle.accent : ClipboardStyle.dim
-                        font.pixelSize: 12
+                        font.pixelSize: ClipboardStyle.fontPixelSmall
 
                         MouseArea {
                             id: clearMouse
@@ -407,7 +429,7 @@ Item {
                     StyledText {
                         text: "Shift+Del delete  ·  Ctrl+Enter path"
                         color: ClipboardStyle.muted
-                        font.pixelSize: 10
+                        font.pixelSize: ClipboardStyle.fontCaption
                     }
                 }
             }
@@ -429,10 +451,21 @@ Item {
         width: clipboardDialog.previewWidth
         height: Math.min(300, Math.max(150, menuCard.height))
         color: ClipboardStyle.panel
-        border.color: ClipboardStyle.line
-        border.width: 1
+        border.color: ClipboardStyle.panelBorderComponent ? "transparent" : ClipboardStyle.panelBorderColor
+        border.width: ClipboardStyle.panelBorderComponent ? 0 : ClipboardStyle.panelBorderWidth
         radius: ClipboardStyle.radius
         clip: true
+
+        Loader {
+            anchors.fill: parent
+            z: 10
+            sourceComponent: ClipboardStyle.panelBorderComponent
+            onLoaded: {
+                item.borderSpec = Qt.binding(() => ClipboardStyle.panelBorderSpec);
+                item.radius = Qt.binding(() => ClipboardStyle.radius);
+            }
+        }
+
 
         ColumnLayout {
             anchors.fill: parent
@@ -442,7 +475,7 @@ Item {
             StyledText {
                 text: clipboardDialog.previewIsImage ? "Image preview" : "Clipboard details"
                 color: ClipboardStyle.dim
-                font.pixelSize: 13
+                font.pixelSize: ClipboardStyle.fontSubtitle
                 font.weight: Font.DemiBold
             }
 
@@ -479,7 +512,7 @@ Item {
                     selectionColor: ClipboardStyle.accent
                     selectedTextColor: ClipboardStyle.bg
                     font.family: ClipboardStyle.fontFamily
-                    font.pixelSize: 14
+                    font.pixelSize: ClipboardStyle.fontTitle
                 }
             }
         }

@@ -1,26 +1,30 @@
 # Runtime troubleshooting
 
-## Missing clipboard theme state
+## Theme integration
 
-The clipboard panel reads the optional generated theme state from:
+The hosted clipboard panel uses Omarchy's live `Color`, `Style`, and `Border`
+tokens. The standalone fallback loads those tokens from the installed shell
+under `$OMARCHY_PATH` (default: `/usr/share/omarchy`). It no longer reads
+`~/.local/state/omarchy/clipboard-theme.json`; no extra theme hook is needed.
 
-```text
-~/.local/state/omarchy/clipboard-theme.json
-```
+Panel content follows the menu palette, while the outer outline uses popup
+border styling. The hosted panel uses Omarchy's native border renderer for
+gradients and per-side widths; the standalone fallback uses a flat border.
 
-On a fresh installation, after a theme change, or before the theme hook has
-created the file, Quickshell may log a `FileView` warning that the file does
-not exist. This is expected and cosmetic. The panel uses its built-in colors
-until the state file becomes available.
-
-Do not create a fake file just to silence the warning. To refresh the real
-theme state, switch the Omarchy theme normally and let the theme hook generate
-the file. The clipboard history itself does not depend on this optional file.
-
-Useful checks:
+If plugin changes are not visible, restart the shell to clear cached QML:
 
 ```sh
-test -f ~/.local/state/omarchy/clipboard-theme.json
-omarchy theme current
-journalctl --user -b --no-pager | rg 'clipboard-theme|iamcheyan.clipboard'
+omarchy restart shell
 ```
+
+Check the active theme and any theme/component errors:
+
+```sh
+omarchy theme current
+journalctl --user -b --no-pager | rg 'iamcheyan.clipboard|ClipboardStyle|ClipboardThemeBridge'
+```
+
+This integration requires an Omarchy shell that provides the current
+`qs.Commons` Color/Style/Border tokens and `qs.Ui.BorderOverlay`. Older shell
+versions require compatibility testing. Nerd Font icons use Omarchy's configured
+menu font; that font or its fontconfig fallback must include the icon glyphs.

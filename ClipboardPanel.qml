@@ -5,9 +5,22 @@ import Quickshell.Wayland
 import qs.Commons
 import qs.Ui
 import "apps/iamcheyan-clipboard/modules/clipboard"
+import "apps/iamcheyan-clipboard/modules/clipboard/widgets"
 
 Panel {
     id: root
+    Component.onCompleted: {
+        ClipboardStyle.palette = Color;
+        ClipboardStyle.style = Style;
+        ClipboardStyle.borderTokens = Border;
+        ClipboardStyle.panelBorderComponent = nativePanelBorder;
+    }
+
+    Component {
+        id: nativePanelBorder
+        BorderOverlay { }
+    }
+
     moduleName: "iamcheyan.clipboard"
     manageIpc: false
     property var anchorItem: null
@@ -56,7 +69,7 @@ Panel {
 
     Process {
         id: cursorPositionProcess
-        command: ["/run/current-system/sw/bin/hyprctl", "cursorpos", "-j"]
+        command: ["hyprctl", "cursorpos", "-j"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
@@ -95,7 +108,7 @@ Panel {
     // selects the matching layershell screen.
     Process {
         id: monitorPositionProcess
-        command: ["/run/current-system/sw/bin/hyprctl", "monitors", "-j"]
+        command: ["hyprctl", "monitors", "-j"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {

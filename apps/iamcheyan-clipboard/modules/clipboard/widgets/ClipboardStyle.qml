@@ -2,54 +2,43 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
-import Quickshell.Io
 
 Singleton {
     id: root
 
-    readonly property string themePath: `${Quickshell.env("HOME")}/.local/state/omarchy/clipboard-theme.json`
-    // Keep the original menu structure, but use the same restrained popup
-    // palette as Omarchy's native panels: one surface, a quiet border, and
-    // the accent only for selection/focus.
-    readonly property color fg: "#e7e7e7"
-    readonly property color dim: "#b0b0b0"
-    readonly property color muted: "#7f7f7f"
-    readonly property color bg: themeJson.background || "#0d0f10"
-    readonly property color panel: "#151719"
-    readonly property color surface: "#1b1e20"
-    readonly property color surfaceHover: "#24282b"
-    readonly property color surfaceSelected: Qt.rgba(accent.r, accent.g, accent.b, 0.18)
-    readonly property color line: "#3a3f43"
-    readonly property color separator: "#2b3033"
-    readonly property color accent: themeJson.primary || "#d7d7d7"
-    readonly property color accentSoft: Qt.rgba(accent.r, accent.g, accent.b, 0.18)
-    readonly property int radius: 10
-
-    readonly property string fontFamily: "MesloLGS Nerd Font"
-    readonly property int fontPixelSmall: 12
-
+    // The embedded panel supplies the host's live singletons. The standalone
+    // entry point supplies the same tokens from the installed shell.
+    property var palette: null
+    property var style: null
+    property var borderTokens: null
+    property Component panelBorderComponent: null
+    readonly property var panelBorderSpec: borderTokens && palette && style
+        ? borderTokens.surfaceSpec("popups", "border", palette.popups.border, Math.max(1, style.space(2)))
+        : null
+    readonly property color panelBorderColor: panelBorderSpec ? panelBorderSpec.color : (palette ? palette.popups.border : fg)
+    readonly property int panelBorderWidth: panelBorderSpec ? borderTokens.uniformWidth(panelBorderSpec) : 2
+    readonly property color fg: palette ? palette.menu.text : "#cacccc"
+    readonly property color dim: Qt.rgba(fg.r, fg.g, fg.b, 0.75)
+    readonly property color muted: palette ? palette.muted : "#707880"
+    readonly property color bg: palette ? palette.menu.background : "#101315"
+    readonly property color panel: bg
+    readonly property color surface: style ? style.normalFill : Qt.rgba(fg.r, fg.g, fg.b, 0.04)
+    readonly property color surfaceHover: style ? style.hoverFill : Qt.rgba(fg.r, fg.g, fg.b, 0.08)
+    readonly property color surfaceSelected: palette ? palette.menu.selectedBackground : surfaceHover
+    readonly property color selectedText: palette ? palette.menu.selectedText : fg
+    readonly property color line: palette ? palette.menu.border : fg
+    readonly property color controlBorder: style ? style.normalBorderColor : line
+    readonly property color separator: Qt.rgba(line.r, line.g, line.b, line.a * 0.28)
+    readonly property color accent: palette ? palette.accent : fg
+    readonly property color accentSoft: style ? style.selectedAccentFill : surfaceHover
+    readonly property int radius: style ? style.cornerRadius : 0
+    readonly property string fontFamily: style ? style.font.menuFamily : "monospace"
+    readonly property int fontPixelSmall: style ? style.font.body : 12
+    readonly property int fontCaption: style ? style.font.caption : 10
+    readonly property int fontSubtitle: style ? style.font.subtitle : 13
+    readonly property int fontTitle: style ? style.font.title : 14
+    readonly property int fontHeading: style ? style.font.heading : 16
     readonly property string cliphistDecode: (Quickshell.env("HOME") ?? "") + "/.cache/media/cliphist"
-
-    FileView {
-        id: themeFile
-        path: root.themePath
-        watchChanges: true
-        // The theme file is optional on first launch. The fallback palette is
-        // intentional, so do not emit a noisy FileView warning for absence.
-        printErrors: false
-
-        onLoadFailed: error => {
-            if (error !== FileViewError.FileNotFound)
-                console.warn(`[ClipboardStyle] Failed to load ${root.themePath}: ${error}`);
-        }
-
-        JsonAdapter {
-            id: themeJson
-            property string primary: "#eeeeee"
-            property string background: "#050505"
-            property string backgroundText: "#f4f4f4"
-        }
-    }
 
     function cleanCliphistEntry(str: string): string {
         const text = String(str).replace(/^\d+\t/, "");
